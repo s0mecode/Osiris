@@ -5,7 +5,7 @@
 #include <cstring>
 #include <span>
 
-#include <Windows.h>
+#include <windows.h>
 
 #include <Utils/GenericPointer.h>
 #include <Utils/MemorySection.h>

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <concepts>
 
 #include "ConfigVariableTypes.h"
 #include <HookContext/HookContextMacros.h>
@@ -27,6 +28,18 @@ private:
     void combatObject(auto&& configConversion)
     {
         configConversion.beginObject(u8"Combat");
+
+        configConversion.beginObject(u8"Aimbot");
+        configConversion.boolean(u8"Enabled", loadVariable<aimbot::Enabled>(), saveVariable<aimbot::Enabled>());
+        configConversion.uint(u8"ActivationKey", loadVariable<aimbot::ActivationKey>(), saveVariable<aimbot::ActivationKey>());
+        configConversion.uint(u8"TargetSelectionMode", loadVariable<aimbot::TargetMode>(), saveVariable<aimbot::TargetMode>());
+        configConversion.uint(u8"AimPoint", loadVariable<aimbot::TargetAimPoint>(), saveVariable<aimbot::TargetAimPoint>());
+        configConversion.uint(u8"MaxTargetNdcDistance", loadVariable<aimbot::MaxTargetNdcDistance>(), saveVariable<aimbot::MaxTargetNdcDistance>());
+        configConversion.uint(u8"BaseMouseGain", loadVariable<aimbot::BaseMouseGain>(), saveVariable<aimbot::BaseMouseGain>());
+        configConversion.uint(u8"AdditionalMouseGain", loadVariable<aimbot::AdditionalMouseGain>(), saveVariable<aimbot::AdditionalMouseGain>());
+        configConversion.uint(u8"MaxMouseStep", loadVariable<aimbot::MaxMouseStep>(), saveVariable<aimbot::MaxMouseStep>());
+        configConversion.uint(u8"MinMouseStep", loadVariable<aimbot::MinMouseStep>(), saveVariable<aimbot::MinMouseStep>());
+        configConversion.endObject();
 
         configConversion.beginObject(u8"NoScopeInaccuracyVis");
         configConversion.boolean(u8"Enabled", loadVariable<no_scope_inaccuracy_vis_vars::Enabled>(), saveVariable<no_scope_inaccuracy_vis_vars::Enabled>());
@@ -220,8 +233,9 @@ private:
                 if constexpr (std::is_same_v<color::HueInteger, typename ConfigVariable::ValueType::ValueType>) {
                     color::HueInteger hue{std::clamp(saturateCast<color::HueInteger::UnderlyingType>(value), color::HueInteger::kMin, color::HueInteger::kMax)};
                     hookContext.config().template setVariableWithoutAutoSave<ConfigVariable>(typename ConfigVariable::ValueType{std::clamp(hue, ConfigVariable::ValueType::kMin, ConfigVariable::ValueType::kMax)});
-                } else if constexpr (std::is_same_v<std::uint8_t, typename ConfigVariable::ValueType::ValueType>) {
-                    hookContext.config().template setVariableWithoutAutoSave<ConfigVariable>(typename ConfigVariable::ValueType{std::clamp(saturateCast<std::uint8_t>(value), ConfigVariable::ValueType::kMin, ConfigVariable::ValueType::kMax)});
+                } else if constexpr (std::unsigned_integral<typename ConfigVariable::ValueType::ValueType>) {
+                    using IntegerType = typename ConfigVariable::ValueType::ValueType;
+                    hookContext.config().template setVariableWithoutAutoSave<ConfigVariable>(typename ConfigVariable::ValueType{std::clamp(saturateCast<IntegerType>(value), ConfigVariable::ValueType::kMin, ConfigVariable::ValueType::kMax)});
                 } else {
                     static_assert(!std::is_same_v<ConfigVariable, ConfigVariable>, "Unsupported type");
                 }

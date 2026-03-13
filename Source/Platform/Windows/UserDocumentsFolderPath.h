@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <ShlObj_core.h>
+#include <shlobj.h>
 
 #include "CoTaskMemDeleter.h"
 #include "DLLs/Shell32Dll.h"

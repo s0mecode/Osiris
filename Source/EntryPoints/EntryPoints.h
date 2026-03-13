@@ -72,6 +72,7 @@ void ViewRenderHook_onRenderStart(cs2::CViewRender* thisptr) noexcept
     soundWatcher.update();
     SoundFeatures{hookContext.soundWatcherState(), hookContext.hooks().viewRenderHook, hookContext}.runOnViewMatrixUpdate();
 
+    hookContext.make<Aimbot>().run();
     hookContext.make<NoScopeInaccuracyVis>().update();
     hookContext.make<RenderingHookEntityLoop>().run();
     hookContext.make<GlowSceneObjects>().removeUnreferencedObjects();

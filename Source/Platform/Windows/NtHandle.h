@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <Windows.h>
+#include <windows.h>
 
 #include "Syscalls/WindowsSyscalls.h"
 

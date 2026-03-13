@@ -1,5 +1,8 @@
 #pragma once
 
+#include <concepts>
+
+#include <Features/Aimbot/AimbotConfigVariables.h>
 #include <Features/Combat/SniperRifles/NoScopeInaccuracyVis/NoScopeInaccuracyVisConfigVariables.h>
 #include <Features/Visuals/PlayerInfoInWorld/PlayerInfoInWorld.h>
 #include <GameClient/Panorama/Slider.h>
@@ -31,8 +34,29 @@ struct SetCommandHandler {
     }
 
 private:
-    void handleCombatSection() noexcept
+    void handleCombatSection() const noexcept
     {
+        if (const auto feature = parser.getLine('/'); feature == "aimbot_max_target_ndc_distance") {
+            handleIntSlider<aimbot::MaxTargetNdcDistance>("aimbot_max_target_ndc_distance");
+        } else if (feature == "aimbot_max_target_ndc_distance_text") {
+            handleIntSliderTextEntry<aimbot::MaxTargetNdcDistance>("aimbot_max_target_ndc_distance");
+        } else if (feature == "aimbot_base_mouse_gain") {
+            handleIntSlider<aimbot::BaseMouseGain>("aimbot_base_mouse_gain");
+        } else if (feature == "aimbot_base_mouse_gain_text") {
+            handleIntSliderTextEntry<aimbot::BaseMouseGain>("aimbot_base_mouse_gain");
+        } else if (feature == "aimbot_additional_mouse_gain") {
+            handleIntSlider<aimbot::AdditionalMouseGain>("aimbot_additional_mouse_gain");
+        } else if (feature == "aimbot_additional_mouse_gain_text") {
+            handleIntSliderTextEntry<aimbot::AdditionalMouseGain>("aimbot_additional_mouse_gain");
+        } else if (feature == "aimbot_max_mouse_step") {
+            handleIntSlider<aimbot::MaxMouseStep>("aimbot_max_mouse_step");
+        } else if (feature == "aimbot_max_mouse_step_text") {
+            handleIntSliderTextEntry<aimbot::MaxMouseStep>("aimbot_max_mouse_step");
+        } else if (feature == "aimbot_min_mouse_step") {
+            handleIntSlider<aimbot::MinMouseStep>("aimbot_min_mouse_step");
+        } else if (feature == "aimbot_min_mouse_step_text") {
+            handleIntSliderTextEntry<aimbot::MinMouseStep>("aimbot_min_mouse_step");
+        }
     }
 
     void handleHudSection() const noexcept
@@ -55,32 +79,36 @@ private:
     template <typename ConfigVariable>
     void handleIntSlider(const char* sliderId) const noexcept
     {
-        const auto newVariableValue = handleIntSlider(sliderId, ConfigVariable::ValueType::kMin, ConfigVariable::ValueType::kMax, GET_CONFIG_VAR(ConfigVariable));
+        using ValueType = typename ConfigVariable::ValueType::ValueType;
+        const auto newVariableValue = handleIntSlider(sliderId, ConfigVariable::ValueType::kMin, ConfigVariable::ValueType::kMax, static_cast<ValueType>(GET_CONFIG_VAR(ConfigVariable)));
         hookContext.config().template setVariable<ConfigVariable>(typename ConfigVariable::ValueType{newVariableValue});
     }
 
-    [[nodiscard]] std::uint8_t handleIntSlider(const char* sliderId, std::uint8_t min, std::uint8_t max, std::uint8_t current) const noexcept
+    template <std::unsigned_integral IntegerType>
+    [[nodiscard]] IntegerType handleIntSlider(const char* sliderId, IntegerType min, IntegerType max, IntegerType current) const noexcept
     {
-        std::uint8_t value{};
+        IntegerType value{};
         if (!parser.parseInt(value) || value == current || value < min || value > max)
             return current;
 
-        auto&& hueSlider = getIntSlider(sliderId);
-        hueSlider.updateTextEntry(value);
+        auto&& slider = getIntSlider(sliderId);
+        slider.updateTextEntry(value);
         return value;
     }
 
     template <typename ConfigVariable>
     void handleIntSliderTextEntry(const char* sliderId) const noexcept
     {
-        const auto newVariableValue = handleIntSliderTextEntry(sliderId, ConfigVariable::ValueType::kMin, ConfigVariable::ValueType::kMax, GET_CONFIG_VAR(ConfigVariable));
+        using ValueType = typename ConfigVariable::ValueType::ValueType;
+        const auto newVariableValue = handleIntSliderTextEntry(sliderId, ConfigVariable::ValueType::kMin, ConfigVariable::ValueType::kMax, static_cast<ValueType>(GET_CONFIG_VAR(ConfigVariable)));
         hookContext.config().template setVariable<ConfigVariable>(typename ConfigVariable::ValueType{newVariableValue});
     }
 
-    [[nodiscard]] std::uint8_t handleIntSliderTextEntry(const char* sliderId, std::uint8_t min, std::uint8_t max, std::uint8_t current) const noexcept
+    template <std::unsigned_integral IntegerType>
+    [[nodiscard]] IntegerType handleIntSliderTextEntry(const char* sliderId, IntegerType min, IntegerType max, IntegerType current) const noexcept
     {
         auto&& slider = getIntSlider(sliderId);
-        std::uint8_t value{};
+        IntegerType value{};
         if (!parser.parseInt(value) || value < min || value > max) {
             slider.updateTextEntry(current);
             return current;

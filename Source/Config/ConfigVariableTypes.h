@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Features/Aimbot/AimbotConfigVariables.h>
 #include <Features/Combat/SniperRifles/NoScopeInaccuracyVis/NoScopeInaccuracyVisConfigVariables.h>
 #include <Features/Hud/BombPlantAlert/BombPlantAlertConfigVariables.h>
 #include <Features/Hud/BombTimer/BombTimerConfigVariables.h>
@@ -14,6 +15,15 @@
 #include <Utils/TypeList.h>
 
 using ConfigVariableTypes = TypeList<
+    aimbot::Enabled,
+    aimbot::ActivationKey,
+    aimbot::TargetMode,
+    aimbot::TargetAimPoint,
+    aimbot::MaxTargetNdcDistance,
+    aimbot::BaseMouseGain,
+    aimbot::AdditionalMouseGain,
+    aimbot::MaxMouseStep,
+    aimbot::MinMouseStep,
     BombTimerEnabled,
     DefusingAlertEnabled,
     KillfeedPreserverEnabled,

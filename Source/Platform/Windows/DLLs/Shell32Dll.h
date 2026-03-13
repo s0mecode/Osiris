@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ShlObj_core.h>
+#include <shlobj.h>
 
 #include <Platform/Windows/WindowsDynamicLibrary.h>
 

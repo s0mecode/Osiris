@@ -108,7 +108,7 @@ $.Osiris = (function () {
       src: "s2r://panorama/images/icons/ui/recent.vsvg",
       texturewidth: "24"
     });
-  
+
     var centerContainer = $.CreatePanel('Panel', navbar, '', {
       class: "content-navbar__tabs__center-container",
     });
@@ -136,7 +136,7 @@ $.Osiris = (function () {
     });
 
     $.CreatePanel('Label', visualsTabButton, '', { text: "Visuals" });
-    
+
     var soundTabButton = $.CreatePanel('RadioButton', centerContainer, 'sound_button', {
       group: "SettingsNavBar",
       class: "content-navbar__tabs__btn",
@@ -196,7 +196,7 @@ $.Osiris = (function () {
     });
 
     $.CreatePanel('Label', modelGlowTabButton, '', { text: "Model Glow" });
-  
+
     var viewmodelTabButton = $.CreatePanel('RadioButton', centerContainer, 'viewmodel_button', {
         group: "VisualsNavBar",
         class: "content-navbar__tabs__btn",
@@ -239,7 +239,7 @@ $.Osiris = (function () {
     var content = $.CreatePanel('Panel', tab, '', {
       class: "SettingsMenuTabContent vscroll"
     });
-  
+
     return content;
   };
 
@@ -254,7 +254,7 @@ $.Osiris = (function () {
     var content = $.CreatePanel('Panel', tab, '', {
       class: "full-width full-height"
     });
-  
+
     return content;
   };
 
@@ -269,7 +269,7 @@ $.Osiris = (function () {
     var content = $.CreatePanel('Panel', tab, '', {
       class: "full-width full-height"
     });
-  
+
     return content;
   };
 
@@ -382,7 +382,7 @@ $.Osiris = (function () {
 )"
 // split the string literal because MSVC does not support string literals longer than 16k chars - error C2026
 u8R"(
-  var createSlider = function (parent, name, id, min, max) {
+  var createSlider = function (parent, name, section, id, min, max) {
     var container = $.CreatePanel('Panel', parent, '', {
       class: "SettingsMenuDropdownContainer"
     });
@@ -402,7 +402,7 @@ u8R"(
       direction: "horizontal"
     });
 
-    slider.SetPanelEvent('onvaluechanged', function () { $.Osiris.sliderUpdated('visuals', id, slider); });
+    slider.SetPanelEvent('onvaluechanged', function () { $.Osiris.sliderUpdated(section, id, slider); });
     slider.min = min;
     slider.max = max;
     slider.increment = 1.0;
@@ -413,7 +413,7 @@ u8R"(
       style: "width: 75px; margin-left: 10px; padding-left: 10px; text-align: center; font-size: 20px; color: #ccccccff; font-weight: bold; font-family: Stratum2, notosans, 'Arial Unicode MS'; border: 2px solid #cccccc15;"
     });
 
-    textEntry.SetPanelEvent('ontextentrysubmit', function () { $.Osiris.sliderTextEntryUpdated('visuals', `${id}_text`, textEntry); });
+    textEntry.SetPanelEvent('ontextentrysubmit', function () { $.Osiris.sliderTextEntryUpdated(section, `${id}_text`, textEntry); });
     textEntry.SetPanelEvent('onfocus', function () { textEntry.style.backgroundColor = 'gradient(linear, 100% 0%, 0% 0%, from(#00000080), color-stop(0, #00000060), to(#00000080))'; });
     textEntry.SetPanelEvent('onblur', function () { textEntry.style.backgroundColor = 'none'; });
     textEntry.SetPanelEvent('onmouseover', function () { if (!textEntry.BHasKeyFocus()) textEntry.style.backgroundColor = 'gradient(linear, 100% 0%, 0% 0%, from(#000000ff), color-stop(0, #00000000), to(#00000050));'; });
@@ -464,6 +464,38 @@ u8R"(
 u8R"(
   var combat = createCombatTab();
   var sniperRiflesTab = createSubTab(combat, 'sniper_rifles');
+  var aimbot = createSection(sniperRiflesTab, 'Aimbot');
+  createYesNoDropDown(aimbot, "Enable Aimbot", 'combat', 'aimbot_enabled');
+  separator(aimbot);
+  createDropDown(aimbot, "Activation Key", 'combat', 'aimbot_activation_key', [
+    'K', 'Left Alt', 'Left Shift', 'C', 'X',
+    'MOUSE_0', 'MOUSE_1', 'MOUSE_2', 'MOUSE_3', 'MOUSE_4',
+    'Esc', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12',
+    '`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'Backspace',
+    'Tab', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '[', ']', '\\',
+    'Caps Lock', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'L', ';', '\'', 'Enter',
+    'Left Ctrl', 'Left Win', 'Space', 'Right Alt', 'Right Win', 'Menu', 'Right Ctrl',
+    'Z', 'V', 'B', 'N', 'M', ',', '.', '/', 'Right Shift',
+    'Print Screen', 'Scroll Lock', 'Pause', 'Insert', 'Home', 'Page Up', 'Delete', 'End', 'Page Down',
+    'Arrow Up', 'Arrow Left', 'Arrow Down', 'Arrow Right',
+    'Num Lock', 'NumPad /', 'NumPad *', 'NumPad -', 'NumPad +', 'NumPad Enter',
+    'NumPad 1', 'NumPad 2', 'NumPad 3', 'NumPad 4', 'NumPad 5', 'NumPad 6', 'NumPad 7', 'NumPad 8', 'NumPad 9', 'NumPad 0', 'NumPad .'
+  ]);
+  separator(aimbot);
+  createDropDown(aimbot, "Target Selection", 'combat', 'aimbot_target_mode', ['Closest To Crosshair', 'Closest By Distance']);
+  separator(aimbot);
+  createDropDown(aimbot, "Aim Point", 'combat', 'aimbot_aim_point', ['Head', 'Body']);
+  separator(aimbot);
+  createSlider(aimbot, "Max Target NDC Distance x0.01", 'combat', 'aimbot_max_target_ndc_distance', 5, 250);
+  separator(aimbot);
+  createSlider(aimbot, "Base Mouse Gain", 'combat', 'aimbot_base_mouse_gain', 10, 600);
+  separator(aimbot);
+  createSlider(aimbot, "Additional Mouse Gain", 'combat', 'aimbot_additional_mouse_gain', 0, 800);
+  separator(aimbot);
+  createSlider(aimbot, "Max Mouse Step", 'combat', 'aimbot_max_mouse_step', 1, 200);
+  separator(aimbot);
+  createSlider(aimbot, "Min Mouse Step x0.01", 'combat', 'aimbot_min_mouse_step', 1, 200);
+
   var noScope = createSection(sniperRiflesTab, 'No scope');
   separator(noScope);
   createYesNoDropDown(noScope, "Visualize Inaccuracy When Not Using a Scope", 'combat', 'no_scope_inacc_vis');
@@ -471,7 +503,7 @@ u8R"(
   $.Osiris.navigateToSubTab('combat', 'sniper_rifles');
 
   var hud = createTab('hud');
-  
+
   var bomb = createSection(hud, 'Bomb');
   createYesNoDropDown(bomb, "Show Bomb Explosion Countdown And Site", 'hud', 'bomb_timer');
   separator(bomb);
@@ -724,12 +756,12 @@ u8R"(
   var viewmodelFov = createSection(viewmodelTab, 'Viewmodel Fov');
   createYesNoDropDown(viewmodelFov, "Modify Viewmodel Fov", 'visuals', 'viewmodel_fov_mod');
   separator(viewmodelFov);
-  createSlider(viewmodelFov, "Fov", 'viewmodel_fov', 40, 90);
+  createSlider(viewmodelFov, "Fov", 'visuals', 'viewmodel_fov', 40, 90);
 
   $.Osiris.navigateToSubTab('visuals', 'player_info');
 
   var sound = createTab('sound');
-  
+
   var playerSoundVisualization = createSection(sound, 'Player Sound Visualization');
   separator(playerSoundVisualization);
   createYesNoDropDown(playerSoundVisualization, "Visualize Player Footstep Sound", 'sound', 'visualize_player_footsteps');

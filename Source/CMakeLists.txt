@@ -4,11 +4,17 @@ set_target_properties(Osiris PROPERTIES
   CXX_VISIBILITY_PRESET hidden
   C_VISIBILITY_PRESET hidden
   POSITION_INDEPENDENT_CODE ON)
+if(WIN32)
+  set_target_properties(Osiris PROPERTIES PREFIX "")
+endif()
 
 target_include_directories(Osiris PRIVATE "${CMAKE_SOURCE_DIR}/Source")
 target_link_libraries(Osiris PRIVATE ${CMAKE_DL_LIBS})
+if(WIN32 AND (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
+  target_link_libraries(Osiris PRIVATE ntdll)
+endif()
 
-if(WIN32)
+if(WIN32 AND (MSVC OR CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC"))
   target_sources(Osiris PRIVATE Platform/Windows/Syscalls/WindowsSyscall.asm)
 endif()
 

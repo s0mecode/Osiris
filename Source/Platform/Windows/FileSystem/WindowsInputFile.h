@@ -2,7 +2,7 @@
 
 #include <cstddef>
 #include <span>
-#include <Windows.h>
+#include <windows.h>
 #include <winternl.h>
 
 #include <Platform/Windows/NtHandle.h>
